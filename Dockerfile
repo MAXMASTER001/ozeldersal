@@ -35,7 +35,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN apt-get update -y && apt-get install -y openssl
 
 # Install Prisma CLI globally to run db push on startup
-RUN npm install -g prisma
+RUN npm install -g prisma@6.19.3
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
