@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 export async function updateProfile(formData: FormData) {
   const session = await auth();
   
-  if (!session || !session.user || session.user.role !== "TEACHER") {
+  if (!session || !session.user || (session.user as any).role !== "TEACHER") {
     return { error: "Yetkisiz erişim." };
   }
 

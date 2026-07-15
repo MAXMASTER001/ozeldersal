@@ -54,7 +54,7 @@ export default function DashboardClient({ profile, listing }: { profile: any, li
           </p>
         </div>
         <Button 
-          variant={isActive ? "outline" : "default"} 
+          variant={isActive ? "outline" : "primary"} 
           onClick={handleToggle}
           disabled={isToggling}
           className="flex items-center gap-2"

@@ -5,7 +5,7 @@ import { ReviewForm } from "@/components/ReviewForm";
 import { getTeacherReviews } from "@/actions/review";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 
 export default async function TeacherProfilePage({ params }: { params: Promise<{ id: string }> }) {

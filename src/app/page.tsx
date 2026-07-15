@@ -36,7 +36,7 @@ export default async function HomePage() {
   // 2. Fetch testimonials
   // Get 3 latest 5-star reviews
   const latestReviews = await prisma.review.findMany({
-    where: { rating: 5, comment: { not: null, not: "" } },
+    where: { rating: 5, AND: [{ comment: { not: null } }, { comment: { not: "" } }] },
     orderBy: { createdAt: 'desc' },
     take: 3,
     include: {
