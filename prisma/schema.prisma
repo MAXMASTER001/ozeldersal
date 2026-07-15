@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("STUDENT") // TEACHER or STUDENT
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  teacherProfile TeacherProfile?
+  listings       Listing[]
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  reviews        Review[]  @relation("UserReviews")
+}
+
+model TeacherProfile {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio            String?
+  education      String?
+  experience     Int?     // Years of experience
+  averageRating  Float    @default(0) // Cache for fast querying
+  reviewCount    Int      @default(0) // Cache for fast querying
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  reviews        Review[] @relation("TeacherReviews")
+}
+
+model Listing {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject     String   // e.g. Matematik, Fizik, İngilizce
+  level       String   // e.g. İlkokul, Lise, Üniversite, LGS, YKS
+  locationType String  // ONLINE, IN_PERSON, BOTH
+  location    String?  // City/District if IN_PERSON
+  price       Int      // Hourly rate
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  senderId    String
+  sender      User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId  String
+  receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  content     String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Review {
+  id               String         @id @default(cuid())
+  studentId        String
+  student          User           @relation("UserReviews", fields: [studentId], references: [id], onDelete: Cascade)
+  teacherProfileId String
+  teacherProfile   TeacherProfile @relation("TeacherReviews", fields: [teacherProfileId], references: [id], onDelete: Cascade)
+  rating           Int            // 1 to 5
+  comment          String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@unique([studentId, teacherProfileId]) // A student can review a teacher only once
+}

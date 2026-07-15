@@ -1,65 +1,53 @@
-import Image from "next/image";
+import { prisma } from "@/lib/prisma";
+import { HomeClient, PopularTeacher, Testimonial } from "@/components/home/HomeClient";
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+export default async function HomePage() {
+  // 1. Fetch popular teachers
+  // Get top 3 teachers with the highest averageRating who have an active listing
+  const popularProfiles = await prisma.teacherProfile.findMany({
+    where: {
+      averageRating: { gt: 0 },
+      user: {
+        listings: { some: { isActive: true } }
+      }
+    },
+    orderBy: { averageRating: 'desc' },
+    take: 3,
+    include: {
+      user: {
+        include: {
+          listings: { where: { isActive: true }, take: 1 }
+        }
+      }
+    }
+  });
+
+  const popularTeachers: PopularTeacher[] = popularProfiles.map(profile => ({
+    id: profile.user.id,
+    name: profile.user.name,
+    subject: profile.user.listings[0]?.subject || "Genel Ders",
+    price: profile.user.listings[0]?.price || 0,
+    averageRating: profile.averageRating,
+    reviewCount: profile.reviewCount,
+  }));
+
+  // 2. Fetch testimonials
+  // Get 3 latest 5-star reviews
+  const latestReviews = await prisma.review.findMany({
+    where: { rating: 5, comment: { not: null, not: "" } },
+    orderBy: { createdAt: 'desc' },
+    take: 3,
+    include: {
+      student: { select: { name: true } }
+    }
+  });
+
+  const testimonials: Testimonial[] = latestReviews.map(review => ({
+    id: review.id,
+    text: review.comment!,
+    author: review.student.name,
+    role: "Öğrenci",
+  }));
+
+  return <HomeClient popularTeachers={popularTeachers} testimonials={testimonials} />;
 }
