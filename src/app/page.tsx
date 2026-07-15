@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { HomeClient, PopularTeacher, Testimonial } from "@/components/home/HomeClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   // 1. Fetch popular teachers
   // Get top 3 teachers with the highest averageRating who have an active listing
