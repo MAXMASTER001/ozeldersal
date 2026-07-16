@@ -48,7 +48,7 @@ export default async function RootLayout({
           <header className="w-full border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black">
             <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
               <Link href="/" className="font-bold text-xl tracking-tight flex items-center gap-2">
-                <img src="/logo.svg" alt="Özel Ders Logo" className="w-8 h-8 rounded-xl" />
+                <img src="/logo.png" alt="Özel Ders Logo" className="w-8 h-8 rounded-xl" />
                 ÖzelDers.
               </Link>
               <div className="flex items-center gap-4">
