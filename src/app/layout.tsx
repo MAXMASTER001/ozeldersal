@@ -46,9 +46,9 @@ export default async function RootLayout({
           disableTransitionOnChange={false}
         >
           <header className="w-full border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black">
-            <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div className="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between">
               <Link href="/" className="flex items-center">
-                <img src="/logo.png" alt="Özel Ders Logo" className="h-10 sm:h-12 w-auto object-contain" />
+                <img src="/logo.png" alt="Özel Ders Logo" className="h-20 w-auto object-contain scale-[1.3] origin-left" />
               </Link>
               <div className="flex items-center gap-4">
                 <nav className="flex items-center gap-4">
