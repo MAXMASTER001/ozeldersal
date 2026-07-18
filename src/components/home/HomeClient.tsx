@@ -70,7 +70,7 @@ export function HomeClient({ popularTeachers, testimonials }: HomeClientProps) {
             />
             <button 
               type="submit"
-              className="bg-black dark:bg-white text-white dark:text-black px-6 sm:px-10 py-3 rounded-full font-medium transition-transform hover:scale-[1.02] active:scale-95"
+              className="bg-orange-500 text-white px-6 sm:px-10 py-3 rounded-full font-medium transition-transform hover:bg-orange-600 hover:scale-[1.02] active:scale-95"
             >
               Bul
             </button>
@@ -86,7 +86,7 @@ export function HomeClient({ popularTeachers, testimonials }: HomeClientProps) {
               >
                 <Link 
                   href={`/search?q=${tag}`}
-                  className="px-4 py-2 rounded-full text-sm border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-black dark:hover:border-white transition-colors bg-white/50 dark:bg-black/50 backdrop-blur-sm"
+                  className="px-4 py-2 rounded-full text-sm border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-orange-500 dark:hover:border-orange-400 transition-colors bg-white/50 dark:bg-black/50 backdrop-blur-sm"
                 >
                   {tag}
                 </Link>

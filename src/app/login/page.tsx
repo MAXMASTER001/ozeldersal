@@ -43,9 +43,9 @@ export default function LoginPage() {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white border border-neutral-200 rounded-2xl p-8 shadow-sm">
+      <div className="w-full max-w-md bg-white text-neutral-950 dark:bg-neutral-900 dark:text-neutral-50 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-8 shadow-sm dark:shadow-black/30">
         <h1 className="text-2xl font-bold mb-2">Giriş Yap</h1>
-        <p className="text-neutral-500 mb-6">Özel ders platformuna hoş geldiniz.</p>
+        <p className="text-neutral-600 dark:text-neutral-400 mb-6">Özel ders platformuna hoş geldiniz.</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -61,11 +61,11 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <p className="text-center text-sm text-neutral-500 mt-6">
-          Hesabınız yok mu? <Link href="/register" className="text-black font-medium">Kayıt Ol</Link>
+        <p className="text-center text-sm text-neutral-600 dark:text-neutral-400 mt-6">
+          Hesabınız yok mu? <Link href="/register" className="text-orange-600 dark:text-orange-400 font-semibold hover:underline">Kayıt Ol</Link>
         </p>
-        <p className="text-center text-sm text-neutral-500 mt-3">
-          <Link href="/forgot-password" className="text-black font-medium">Şifremi unuttum</Link>
+        <p className="text-center text-sm text-neutral-600 dark:text-neutral-400 mt-3">
+          <Link href="/forgot-password" className="text-orange-600 dark:text-orange-400 font-semibold hover:underline">Şifremi unuttum</Link>
         </p>
       </div>
     </div>
