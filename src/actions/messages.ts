@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { detectContactInfoType } from "@/lib/validation";
+import { writeAuditLog } from "@/lib/security";
 
 export async function sendMessage(receiverId: string, content: string) {
   const session = await auth();
@@ -98,6 +99,7 @@ export async function reportUser(targetId: string, reason: string, messageId?: s
         reason,
       },
     });
+    await writeAuditLog({ actorId: session.user.id, action: "REPORT_CREATED", targetType: "USER", targetId, metadata: { messageId: messageId || null } });
     return { success: true };
   } catch (error) {
     console.error("Report Error:", error);

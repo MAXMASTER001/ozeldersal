@@ -38,7 +38,7 @@ export default function RegisterPage() {
     <div className="flex-1 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md bg-white border border-neutral-200 rounded-2xl p-8 shadow-sm">
         <h1 className="text-2xl font-bold mb-2">Kayıt Ol</h1>
-        <p className="text-neutral-500 mb-6">Aramıza katılarak mükemmel eşleşmeyi yakalayın.</p>
+        <p className="text-neutral-500 mb-6">Kayıttan sonra hesabınızı e-posta bağlantısıyla etkinleştireceksiniz.</p>
 
         {error && (
           <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm mb-4">
@@ -47,6 +47,7 @@ export default function RegisterPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <input name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
           <div>
             <label className="text-sm font-medium mb-1 block">Ad Soyad</label>
             <Input name="name" required placeholder="Örn: Ayşe Yılmaz" />

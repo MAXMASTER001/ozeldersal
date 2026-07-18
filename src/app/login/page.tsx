@@ -64,6 +64,9 @@ export default function LoginPage() {
         <p className="text-center text-sm text-neutral-500 mt-6">
           Hesabınız yok mu? <Link href="/register" className="text-black font-medium">Kayıt Ol</Link>
         </p>
+        <p className="text-center text-sm text-neutral-500 mt-3">
+          <Link href="/forgot-password" className="text-black font-medium">Şifremi unuttum</Link>
+        </p>
       </div>
     </div>
   );

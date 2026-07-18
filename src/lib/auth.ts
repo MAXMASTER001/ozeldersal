@@ -2,6 +2,8 @@ import NextAuth, { type DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import { prisma } from "./prisma";
+import crypto from "crypto";
+import { consumeRateLimit } from "./security";
 
 declare module "next-auth" {
   interface Session {
@@ -24,16 +26,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials) {
+      async authorize(credentials, request) {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
 
+        const ip = request?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+        const key = `login:${crypto.createHash("sha256").update(ip).digest("hex")}`;
+        const limit = await consumeRateLimit(key, 10, 15 * 60 * 1000);
+        if (!limit.allowed) return null;
         const user = await prisma.user.findUnique({
           where: { email: credentials.email as string }
         });
 
-        if (!user || !user.password) {
+        if (!user || !user.password || !user.emailVerified || user.isSuspended) {
           return null;
         }
 

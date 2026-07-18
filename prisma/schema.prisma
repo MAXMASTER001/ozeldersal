@@ -21,6 +21,8 @@ model User {
   role      String   @default("STUDENT") // TEACHER or STUDENT
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  emailVerified DateTime?
+  isSuspended Boolean @default(false)
 
   teacherProfile TeacherProfile?
   listings       Listing[]
@@ -29,6 +31,10 @@ model User {
   reviews        Review[]  @relation("UserReviews")
   notifications  Notification[]
   reports        Report[] @relation("Reporter")
+  resolvedReports Report[] @relation("ResolvedBy")
+  auditLogs       AuditLog[]
+  emailVerificationTokens EmailVerificationToken[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 model TeacherProfile {
@@ -119,5 +125,48 @@ model Report {
   targetId   String   // reported user id
   messageId  String?
   reason     String
+  status     String   @default("OPEN")
+  resolvedAt DateTime?
+  resolvedById String?
+  resolvedBy User? @relation("ResolvedBy", fields: [resolvedById], references: [id], onDelete: SetNull)
   createdAt  DateTime @default(now())
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model RateLimit {
+  key         String   @id
+  count       Int      @default(0)
+  windowStart DateTime
+  updatedAt   DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action    String
+  targetType String
+  targetId  String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([targetType, targetId])
+  @@index([createdAt])
 }
