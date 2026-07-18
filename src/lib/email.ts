@@ -7,7 +7,7 @@ function appUrl() {
 }
 
 async function sendEmail(email: Email) {
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = process.env.BREVO_API_KEY;
   const from = process.env.EMAIL_FROM;
   if (!apiKey || !from) {
     if (process.env.NODE_ENV === "production") throw new Error("E-posta sağlayıcısı yapılandırılmamış.");
@@ -16,10 +16,15 @@ async function sendEmail(email: Email) {
     return;
   }
 
-  const response = await fetch("https://api.resend.com/emails", {
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from, ...email }),
+    headers: { "api-key": apiKey, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sender: { email: from, name: process.env.EMAIL_FROM_NAME || "Özeldersal" },
+      to: [{ email: email.to }],
+      subject: email.subject,
+      htmlContent: email.html,
+    }),
   });
   if (!response.ok) throw new Error("E-posta gönderilemedi.");
 }
