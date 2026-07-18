@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --import tsx --test tests/**/*.test.ts",
+    "test": "node --import tsx --test tests/*.test.ts",
     "seed:test-data": "node scripts/seed-test-data.mjs",
     "test:seed-data": "node scripts/verify-test-data.mjs"
   },
