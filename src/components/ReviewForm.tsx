@@ -12,8 +12,8 @@ export function ReviewForm({ teacherProfileId }: { teacherProfileId: string }) {
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitReview = async () => {
+    if (isSubmitting) return;
     if (rating === 0) {
       toast.error("Lütfen bir puan verin.");
       return;
@@ -30,6 +30,11 @@ export function ReviewForm({ teacherProfileId }: { teacherProfileId: string }) {
       setComment("");
       setRating(5);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    void submitReview();
   };
 
   return (
@@ -70,7 +75,7 @@ export function ReviewForm({ teacherProfileId }: { teacherProfileId: string }) {
         />
       </div>
 
-      <Button type="submit" disabled={isSubmitting} className="w-full">
+      <Button type="button" onClick={submitReview} disabled={isSubmitting} className="w-full">
         {isSubmitting ? "Gönderiliyor..." : "Yorumu Gönder"}
       </Button>
     </form>

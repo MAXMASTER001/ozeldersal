@@ -53,7 +53,7 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
     .join(" · ") || profile.education || null;
 
   return (
-    <div className="flex-1 max-w-4xl mx-auto w-full p-4 md:p-8 pb-28">
+    <div className="flex-1 max-w-4xl mx-auto w-full p-4 pb-40 md:p-8 md:pb-40">
       {/* Header Profile Section */}
       <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 md:p-10 mb-8 flex flex-col md:flex-row items-center md:items-start gap-8 shadow-sm">
         {profile.photoUrl ? (

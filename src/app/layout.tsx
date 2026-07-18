@@ -38,8 +38,10 @@ export default async function RootLayout({
           <header className="w-full border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black">
             <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
               <Link href="/" className="flex items-center">
-                <span className="font-extrabold text-2xl tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">
-                  özeldersal
+                <span className="font-extrabold text-2xl tracking-tighter">
+                  <span className="text-orange-500">özel</span>
+                  <span className="text-neutral-950 dark:text-neutral-100">ders</span>
+                  <span className="text-orange-500">al</span>
                 </span>
               </Link>
               <div className="flex items-center gap-4">

@@ -6,7 +6,9 @@
     "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:test-data": "node scripts/seed-test-data.mjs",
+    "test:seed-data": "node scripts/verify-test-data.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

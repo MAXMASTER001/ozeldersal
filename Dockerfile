@@ -34,7 +34,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 # Install openssl for Prisma
 RUN apt-get update -y && apt-get install -y openssl
 
-# Install Prisma CLI globally to run db push on startup
+# Install Prisma CLI globally to run versioned migrations on startup.
 RUN npm install -g prisma@6.19.3
 
 RUN addgroup --system --gid 1001 nodejs
@@ -42,11 +42,11 @@ RUN adduser --system --uid 1001 nextjs
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
+RUN mkdir -p .next public/uploads
+RUN chown -R nextjs:nodejs .next public
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
@@ -60,6 +60,6 @@ EXPOSE 3000
 
 ENV PORT 3000
 
-# server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD ["sh", "-c", "prisma db push --accept-data-loss --skip-generate && node server.js"]
+# server.js is created by next build from the standalone output.
+# `migrate deploy` only applies checked-in migrations; it never performs destructive schema pushes.
+CMD ["sh", "-c", "prisma migrate deploy && node server.js"]
