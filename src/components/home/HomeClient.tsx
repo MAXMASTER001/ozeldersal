@@ -112,7 +112,7 @@ export function HomeClient({ popularTeachers, testimonials }: HomeClientProps) {
               transition={{ delay: i * 0.2 }}
               className="flex flex-col items-center text-center space-y-4"
             >
-              <div className="w-16 h-16 rounded-2xl bg-white dark:bg-neutral-800 shadow-sm flex items-center justify-center text-neutral-800 dark:text-neutral-200">
+              <div className="w-16 h-16 rounded-2xl bg-orange-50 dark:bg-orange-500/10 shadow-sm ring-1 ring-orange-100 dark:ring-orange-500/20 flex items-center justify-center text-orange-500 dark:text-orange-400">
                 <feature.icon size={32} />
               </div>
               <h3 className="text-xl font-bold">{feature.title}</h3>
@@ -129,7 +129,7 @@ export function HomeClient({ popularTeachers, testimonials }: HomeClientProps) {
             <h2 className="text-3xl font-bold mb-2">Popüler Öğretmenler</h2>
             <p className="text-neutral-500 dark:text-neutral-400">Bu haftanın en çok tercih edilen eğitmenleri.</p>
           </div>
-          <Link href="/search" className="text-sm font-medium hover:underline hidden sm:block">
+          <Link href="/search" className="text-sm font-semibold text-orange-600 dark:text-orange-400 hover:underline hidden sm:block">
             Tümünü Gör &rarr;
           </Link>
         </div>
