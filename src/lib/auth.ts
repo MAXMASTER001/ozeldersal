@@ -59,7 +59,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        // @ts-ignore - custom role property
+        // @ts-expect-error - custom role property
         token.role = user.role;
       }
       return token;
@@ -67,7 +67,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id as string;
-        // @ts-ignore - custom role property
         session.user.role = token.role as string;
       }
       return session;

@@ -1,24 +1,14 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "sonner";
-import { MessageSquare, Search, User, Settings } from "lucide-react";
+import { Search, User } from "lucide-react";
 import { UserMenu } from "@/components/auth/UserMenu";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Özel Ders Al",
@@ -36,7 +26,7 @@ export default async function RootLayout({
     <html
       lang="tr"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className="h-full antialiased"
     >
       <body suppressHydrationWarning className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-300">
         <ThemeProvider
@@ -49,7 +39,7 @@ export default async function RootLayout({
             <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
               <Link href="/" className="flex items-center">
                 <span className="font-extrabold text-2xl tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">
-                  ÖzelDers.
+                  özeldersal
                 </span>
               </Link>
               <div className="flex items-center gap-4">
@@ -58,7 +48,10 @@ export default async function RootLayout({
                 <Search size={16} /> Öğretmen Bul
               </Link>
               {session ? (
-                <UserMenu user={session.user} />
+                <>
+                  <NotificationBell />
+                  <UserMenu user={session.user} />
+                </>
               ) : (
                 <Link href="/login">
                   <Button size="sm" className="flex items-center gap-1">

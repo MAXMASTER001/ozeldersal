@@ -2,10 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { User, LogOut, Settings, MessageSquare, ChevronDown } from "lucide-react";
+import { LogOut, Settings, MessageSquare, ChevronDown, Bell } from "lucide-react";
 import { signOut } from "next-auth/react";
 
-export function UserMenu({ user }: { user: any }) {
+type MenuUser = { name?: string | null; email?: string | null; role?: string };
+
+export function UserMenu({ user }: { user: MenuUser }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -50,12 +52,26 @@ export function UserMenu({ user }: { user: any }) {
                 <Settings size={16} className="text-neutral-500" /> Dashboard
               </Link>
             )}
-            <Link 
-              href="/messages" 
+            <Link
+              href="/messages"
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-3 px-3 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
             >
               <MessageSquare size={16} className="text-neutral-500" /> Mesajlar
+            </Link>
+            <Link
+              href="/notifications"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 px-3 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+            >
+              <Bell size={16} className="text-neutral-500" /> Bildirimler
+            </Link>
+            <Link
+              href="/settings"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 px-3 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+            >
+              <Settings size={16} className="text-neutral-500" /> Hesap Ayarları
             </Link>
             
             <div className="h-px bg-neutral-100 dark:bg-neutral-800 my-1 mx-2" />

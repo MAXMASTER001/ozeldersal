@@ -2,16 +2,22 @@
 
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
+import { registerSchema } from "@/lib/validation";
 
 export async function registerUser(formData: FormData) {
-  const name = formData.get("name") as string;
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-  const role = formData.get("role") as string;
+  const parsed = registerSchema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    password: formData.get("password"),
+    role: formData.get("role"),
+  });
 
-  if (!name || !email || !password || !role) {
-    return { error: "Lütfen tüm alanları doldurun." };
+  if (!parsed.success) {
+    const firstError = Object.values(parsed.error.flatten().fieldErrors)[0]?.[0];
+    return { error: firstError || "Lütfen tüm alanları doğru doldurun." };
   }
+
+  const { name, email, password, role } = parsed.data;
 
   try {
     const existingUser = await prisma.user.findUnique({
@@ -24,12 +30,12 @@ export async function registerUser(formData: FormData) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        role // "TEACHER" or "STUDENT"
+        role
       }
     });
 

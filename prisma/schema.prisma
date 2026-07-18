@@ -4,7 +4,7 @@
 generator client {
   provider = "prisma-client-js"
   engineType = "library"
-  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
+  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-arm64-openssl-3.0.x"]
 }
 
 datasource db {
@@ -17,6 +17,7 @@ model User {
   email     String   @unique
   password  String
   name      String
+  phone     String?
   role      String   @default("STUDENT") // TEACHER or STUDENT
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -26,6 +27,8 @@ model User {
   sentMessages     Message[] @relation("SentMessages")
   receivedMessages Message[] @relation("ReceivedMessages")
   reviews        Review[]  @relation("UserReviews")
+  notifications  Notification[]
+  reports        Report[] @relation("Reporter")
 }
 
 model TeacherProfile {
@@ -33,14 +36,20 @@ model TeacherProfile {
   userId         String   @unique
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   bio            String?
-  education      String?
+  photoUrl       String?
+  education      String?   // deprecated, kept for backward compat
+  university     String?
+  department     String?
+  graduationYear Int?
+  location       String?   // city for in-person
   experience     Int?     // Years of experience
-  averageRating  Float    @default(0) // Cache for fast querying
-  reviewCount    Int      @default(0) // Cache for fast querying
+  averageRating  Float    @default(0)
+  reviewCount    Int      @default(0)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   reviews        Review[] @relation("TeacherReviews")
+  views          ProfileView[]
 }
 
 model Listing {
@@ -48,8 +57,9 @@ model Listing {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   subject     String   // e.g. Matematik, Fizik, İngilizce
-  level       String   // e.g. İlkokul, Lise, Üniversite, LGS, YKS
-  locationType String  // ONLINE, IN_PERSON, BOTH
+  level       String   // primary level label (e.g. İlkokul, Lise, LGS)
+  levels      String   @default("") // comma-separated extra levels/exam tags
+  locationType String  // ONLINE, IN_PERSON, BOTH (labels in Turkish in UI)
   location    String?  // City/District if IN_PERSON
   price       Int      // Hourly rate
   isActive    Boolean  @default(true)
@@ -79,5 +89,35 @@ model Review {
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
-  @@unique([studentId, teacherProfileId]) // A student can review a teacher only once
+  @@unique([studentId, teacherProfileId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // NEW_MESSAGE, PROFILE_VIEW_SUMMARY, REVIEW
+  title     String
+  body      String?
+  link      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ProfileView {
+  id               String         @id @default(cuid())
+  teacherProfileId String
+  teacherProfile   TeacherProfile @relation(fields: [teacherProfileId], references: [id], onDelete: Cascade)
+  viewerId         String?        // null for anonymous
+  createdAt        DateTime       @default(now())
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  reporterId String
+  reporter   User     @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  targetId   String   // reported user id
+  messageId  String?
+  reason     String
+  createdAt  DateTime @default(now())
 }

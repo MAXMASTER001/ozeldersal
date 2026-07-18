@@ -17,6 +17,14 @@ export default async function MessagesPage({
 
   const currentUserId = session.user.id;
 
+  // Mark messages from the active conversation partner as read
+  if (params.userId) {
+    await prisma.message.updateMany({
+      where: { senderId: params.userId, receiverId: currentUserId, isRead: false },
+      data: { isRead: true },
+    });
+  }
+
   // Fetch all messages involving the current user
   const allMessages = await prisma.message.findMany({
     where: {
@@ -33,7 +41,20 @@ export default async function MessagesPage({
   });
 
   // Group messages by conversation partner
-  const conversationsMap = new Map<string, any>();
+  type ConvMessage = {
+    id: string;
+    senderId: string;
+    receiverId: string;
+    content: string;
+    isRead: boolean;
+    createdAt: Date;
+  };
+  type Conv = {
+    user: { id: string; name: string };
+    messages: ConvMessage[];
+    unreadCount: number;
+  };
+  const conversationsMap = new Map<string, Conv>();
 
   // If URL has ?userId=..., make sure that user is in the conversations list (even if no messages yet)
   const initialUserId = params.userId;
@@ -42,28 +63,36 @@ export default async function MessagesPage({
     if (userToChat) {
       conversationsMap.set(userToChat.id, {
         user: userToChat,
-        messages: []
+        messages: [],
+        unreadCount: 0,
       });
     }
   }
 
   allMessages.forEach(msg => {
     const partner = msg.senderId === currentUserId ? msg.receiver : msg.sender;
-    
+
     if (!conversationsMap.has(partner.id)) {
       conversationsMap.set(partner.id, {
         user: partner,
-        messages: []
+        messages: [],
+        unreadCount: 0,
       });
     }
-    
-    conversationsMap.get(partner.id).messages.push({
+
+    const conv = conversationsMap.get(partner.id)!;
+    conv.messages.push({
       id: msg.id,
       senderId: msg.senderId,
       receiverId: msg.receiverId,
       content: msg.content,
+      isRead: msg.isRead,
       createdAt: msg.createdAt,
     });
+
+    if (msg.receiverId === currentUserId && !msg.isRead) {
+      conv.unreadCount += 1;
+    }
   });
 
   const conversations = Array.from(conversationsMap.values()).sort((a, b) => {
@@ -73,9 +102,9 @@ export default async function MessagesPage({
   });
 
   return (
-    <ChatClient 
-      currentUserId={currentUserId} 
-      conversations={conversations} 
+    <ChatClient
+      currentUserId={currentUserId}
+      conversations={conversations}
       initialUserId={initialUserId}
     />
   );

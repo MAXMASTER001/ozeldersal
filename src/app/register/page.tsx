@@ -27,7 +27,7 @@ export default function RegisterPage() {
       } else if (res.success) {
         router.push("/login");
       }
-    } catch (err) {
+    } catch {
       setError("Bir hata oluştu.");
     } finally {
       setIsLoading(false);

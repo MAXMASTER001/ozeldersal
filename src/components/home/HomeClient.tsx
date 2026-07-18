@@ -189,7 +189,7 @@ export function HomeClient({ popularTeachers, testimonials }: HomeClientProps) {
                 transition={{ delay: i * 0.2 }}
                 className="bg-neutral-900 dark:bg-neutral-100 p-8 rounded-2xl text-left"
               >
-                <p className="text-neutral-300 dark:text-neutral-700 text-lg italic mb-6">"{t.text}"</p>
+                <p className="text-neutral-300 dark:text-neutral-700 text-lg italic mb-6">&ldquo;{t.text}&rdquo;</p>
                 <div>
                   <div className="font-bold">{t.author}</div>
                   <div className="text-sm text-neutral-500">{t.role}</div>

@@ -34,7 +34,7 @@ export default function LoginPage() {
         router.push("/");
         router.refresh();
       }
-    } catch (err) {
+    } catch {
       toast.error("Bir hata oluştu.");
     } finally {
       setIsLoading(false);
