@@ -28,8 +28,8 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Install openssl for Prisma
 RUN apt-get update -y && apt-get install -y openssl
@@ -58,8 +58,10 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
+ENV PORT=3000
 
 # server.js is created by next build from the standalone output.
 # `migrate deploy` only applies checked-in migrations; it never performs destructive schema pushes.
-CMD ["sh", "-c", "prisma migrate deploy && node server.js"]
+# Set PRISMA_BASELINE_EXISTING_DB=true for exactly one deployment when adopting
+# migrations on an existing db-push database, then remove the variable.
+CMD ["sh", "-c", "if [ \"${PRISMA_BASELINE_EXISTING_DB:-false}\" = \"true\" ]; then prisma migrate resolve --applied 20260718160000_init || true; fi; prisma migrate deploy && node server.js"]
