@@ -26,7 +26,17 @@ async function sendEmail(email: Email) {
       htmlContent: email.html,
     }),
   });
-  if (!response.ok) throw new Error("E-posta gönderilemedi.");
+  if (!response.ok) {
+    // Brevo'nun güvenli hata metni yalnızca sunucu loguna yazılır. Böylece
+    // kullanıcıya sağlayıcı ayrıntılarını sızdırmadan yapılandırma sorunları
+    // Dokploy loglarından teşhis edilebilir.
+    const details = await response.text();
+    console.error("Brevo transactional email request failed", {
+      status: response.status,
+      details: details.slice(0, 1_000),
+    });
+    throw new Error("E-posta gönderilemedi.");
+  }
 }
 
 export async function sendVerificationEmail(to: string, token: string) {

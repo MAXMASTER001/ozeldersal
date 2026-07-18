@@ -22,15 +22,34 @@ export async function registerUser(formData: FormData) {
     return { error: firstError || "Lütfen tüm alanları doğru doldurun." };
   }
 
-  const { name, email, password, role } = parsed.data;
+  const { name, password, role } = parsed.data;
+  const email = parsed.data.email.trim().toLowerCase();
 
   try {
     const existingUser = await prisma.user.findUnique({
       where: { email }
     });
 
-    if (existingUser) {
+    if (existingUser?.emailVerified) {
       return { error: "Bu e-posta adresi zaten kullanılıyor." };
+    }
+
+    // İlk gönderim başarısız olduysa yarım kalmış doğrulanmamış hesabı tekrar
+    // kayıt olmaya zorlamadan yeni bir doğrulama bağlantısı gönderebilmeliyiz.
+    if (existingUser) {
+      const token = createToken();
+      await prisma.$transaction([
+        prisma.emailVerificationToken.deleteMany({ where: { userId: existingUser.id } }),
+        prisma.emailVerificationToken.create({
+          data: {
+            userId: existingUser.id,
+            tokenHash: hashToken(token),
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+          },
+        }),
+      ]);
+      await sendVerificationEmail(existingUser.email, token);
+      return { success: true };
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
