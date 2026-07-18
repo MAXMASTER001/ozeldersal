@@ -10,7 +10,8 @@
    ```
 
    Boş bir üretim veritabanında bu adıma gerek yoktur; container başlangıcında `prisma migrate deploy` migration'ı uygular.
-5. GitHub Actions kontrolleri başarılı olduktan sonra yalnızca `main` dalını production'a otomatik deploy edin. Önce staging'e deploy edip `/api/health` kontrolünü doğrulayın.
+5. Dokploy'de **Auto Deploy** açıkken, Dokploy'un Webhook URL'sini GitHub deposunda **Settings → Webhooks** bölümüne ekleyin. `application/json`, yalnızca `push` olayı ve SSL doğrulaması seçili kalmalıdır. Dokploy'deki dal ile GitHub webhook'unu tetikleyen dalın `main` olduğundan emin olun. GitHub Actions kalite kontrollerini ayrı çalıştırır; deploy tetikleyicisi GitHub webhook'udur.
+6. Önce staging'e deploy edip `/api/health` kontrolünü doğrulayın.
 
 ## Uygulama dışı zorunlu adımlar
 
