@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -46,6 +48,9 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white text-neutral-950 dark:bg-neutral-900 dark:text-neutral-50 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-8 shadow-sm dark:shadow-black/30">
         <h1 className="text-2xl font-bold mb-2">Giriş Yap</h1>
         <p className="text-neutral-600 dark:text-neutral-400 mb-6">Özel ders platformuna hoş geldiniz.</p>
+        {searchParams.get("verified") === "1" && (
+          <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-800 dark:border-green-900 dark:bg-green-950/40 dark:text-green-300">E-posta adresiniz doğrulandı. Şimdi giriş yapabilirsiniz.</div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
