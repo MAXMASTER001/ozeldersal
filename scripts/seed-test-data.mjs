@@ -29,9 +29,12 @@ const reviewComments = [
 
 const teacherEmail = (index) => `test.ogretmen${String(index + 1).padStart(2, "0")}@ozeldersal.test`;
 const studentEmail = (index) => `test.ogrenci${String(index + 1).padStart(2, "0")}@ozeldersal.test`;
-const demoPortrait = (name, index) => index === 0
-  ? "/demo-teachers/ayse-demir.png"
-  : `https://api.dicebear.com/9.x/personas/svg?seed=${encodeURIComponent(name)}&backgroundColor=ffedd5`;
+const teacherPortraits = [
+  "ayse-demir", "mehmet-kaya", "elif-sahin", "can-yildiz", "zeynep-arslan", "burak-celik",
+  "selin-aydin", "emre-koc", "derya-gunes", "ozan-aksoy", "ece-yalcin", "mert-kaplan",
+  "ipek-erdem", "deniz-kurt", "seda-tunc", "arda-ozkan", "melis-polat", "kaan-yuce",
+];
+const demoPortrait = (index) => `/demo-teachers/${teacherPortraits[index]}.png`;
 
 async function upsertUsers(names, role, emailFor, passwordHash) {
   return Promise.all(names.map((name, index) => prisma.user.upsert({
@@ -53,7 +56,7 @@ async function seed() {
     where: { userId: teacher.id },
     update: {
       bio: `${subjects[index]} alanında ${6 + (index % 12)} yıllık deneyime sahibim. Öğrencinin hedefini ve öğrenme hızını merkeze alan, bol örnekli ve düzenli takipli dersler planlıyorum. Her dersin sonunda kısa tekrar notları ve kişiye özel çalışma önerileri paylaşıyorum.`,
-      photoUrl: demoPortrait(teacher.name, index),
+      photoUrl: demoPortrait(index),
       university: universities[index % universities.length],
       department: departments[index % departments.length],
       graduationYear: 2008 + (index % 14),
@@ -63,7 +66,7 @@ async function seed() {
     create: {
       userId: teacher.id,
       bio: `${subjects[index]} alanında ${6 + (index % 12)} yıllık deneyime sahibim. Öğrencinin hedefini ve öğrenme hızını merkeze alan, bol örnekli ve düzenli takipli dersler planlıyorum. Her dersin sonunda kısa tekrar notları ve kişiye özel çalışma önerileri paylaşıyorum.`,
-      photoUrl: demoPortrait(teacher.name, index),
+      photoUrl: demoPortrait(index),
       university: universities[index % universities.length],
       department: departments[index % departments.length],
       graduationYear: 2008 + (index % 14),
