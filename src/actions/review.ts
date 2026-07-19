@@ -26,6 +26,10 @@ export async function addReview(teacherProfileId: string, teacherUserId: string,
   if (validationError) return { error: validationError };
 
   try {
+    const teacher = await prisma.teacherProfile.findUnique({ where: { id: teacherProfileId }, select: { userId: true } });
+    if (!teacher) return { error: "Öğretmen profili bulunamadı." };
+    if (teacher.userId === session.user.id) return { error: "Kendi profilinize yorum yapamazsınız." };
+
     // Determine if user has already reviewed this teacher
     const existingReview = await prisma.review.findUnique({
       where: {
@@ -49,6 +53,16 @@ export async function addReview(teacherProfileId: string, teacherUserId: string,
           teacherProfileId,
           rating,
           comment: comment.trim() || null,
+        },
+      });
+
+      await tx.notification.create({
+        data: {
+          userId: teacher.userId,
+          type: "REVIEW",
+          title: "Yeni değerlendirme",
+          body: `Bir öğrenci profiliniz için ${rating} yıldız verdi.`,
+          link: `/teacher/${teacher.userId}`,
         },
       });
 
