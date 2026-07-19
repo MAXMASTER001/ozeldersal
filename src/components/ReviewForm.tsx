@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 
 type ExistingReview = { id: string; rating: number; comment: string | null };
 
-export function ReviewForm({ teacherProfileId, teacherUserId, existingReview }: { teacherProfileId: string; teacherUserId: string; existingReview?: ExistingReview }) {
+export function ReviewForm({ teacherProfileId, teacherUserId, existingReview, embedded = false, onSaved }: { teacherProfileId: string; teacherUserId: string; existingReview?: ExistingReview; embedded?: boolean; onSaved?: () => void }) {
   const router = useRouter();
   const isEditing = Boolean(existingReview);
   const [rating, setRating] = useState(existingReview?.rating ?? 5);
@@ -34,6 +34,7 @@ export function ReviewForm({ teacherProfileId, teacherUserId, existingReview }: 
       toast.error(result.error);
     } else {
       toast.success(isEditing ? "Yorumunuz güncellendi!" : "Yorumunuz başarıyla eklendi!");
+      onSaved?.();
       router.refresh();
     }
   };
@@ -44,8 +45,8 @@ export function ReviewForm({ teacherProfileId, teacherUserId, existingReview }: 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm mt-8">
-      <h3 className="text-xl font-bold mb-4">{isEditing ? "Yorumunuzu Düzenleyin" : "Değerlendirme Bırakın"}</h3>
+    <form onSubmit={handleSubmit} className={embedded ? "" : "bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm mt-8"}>
+      <h3 id={embedded ? "review-edit-title" : undefined} className="text-xl font-bold mb-4">{isEditing ? "Yorumunuzu Düzenleyin" : "Değerlendirme Bırakın"}</h3>
       
       <div className="flex items-center gap-2 mb-4">
         <span className="text-sm font-medium mr-2">Puan:</span>

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Star, MapPin, BookOpen, Clock, User as UserIcon, GraduationCap } from "lucide-react";
 import { ReviewForm } from "@/components/ReviewForm";
+import { ReviewEditDialog } from "@/components/ReviewEditDialog";
 import { getTeacherReviews } from "@/actions/review";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -158,10 +159,15 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                           </div>
                         </div>
                       </div>
-                      <div className="flex text-yellow-400">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} size={16} className={i < review.rating ? "fill-current" : "text-neutral-200 dark:text-neutral-700"} />
-                        ))}
+                      <div className="flex items-center gap-2">
+                        <div className="flex text-yellow-400">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} size={16} className={i < review.rating ? "fill-current" : "text-neutral-200 dark:text-neutral-700"} />
+                          ))}
+                        </div>
+                        {session?.user?.id === review.studentId && (
+                          <ReviewEditDialog teacherProfileId={profile.id} teacherUserId={user.id} review={{ id: review.id, rating: review.rating, comment: review.comment }} />
+                        )}
                       </div>
                     </div>
                     {review.comment && <p className="text-neutral-600 dark:text-neutral-300 mt-2">{review.comment}</p>}
@@ -171,8 +177,8 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
             </div>
 
             {/* Review Form */}
-            {(session?.user?.id && session.user.id !== user.id) && (
-              <ReviewForm teacherProfileId={profile.id} teacherUserId={user.id} existingReview={currentUserReview ? { id: currentUserReview.id, rating: currentUserReview.rating, comment: currentUserReview.comment } : undefined} />
+            {(session?.user?.id && session.user.id !== user.id && !currentUserReview) && (
+              <ReviewForm teacherProfileId={profile.id} teacherUserId={user.id} />
             )}
           </section>
         </div>
