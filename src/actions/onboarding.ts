@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { requiredPhoneSchema } from "@/lib/validation";
 import { z } from "zod";
 
 const onboardingSchema = z.object({
@@ -16,6 +17,7 @@ const onboardingSchema = z.object({
   graduationYear: z.number().int().min(1950).max(2030).optional().nullable(),
   bio: z.string().min(20, "Biyografi en az 20 karakter olmalıdır.").max(300, "Biyografi en fazla 300 karakter olabilir."),
   photoUrl: z.string().optional().nullable(),
+  phone: requiredPhoneSchema,
 });
 
 export async function completeOnboarding(input: unknown) {
@@ -40,6 +42,11 @@ export async function completeOnboarding(input: unknown) {
   }
 
   try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { phone: data.phone },
+    });
+
     // 1. Create or update TeacherProfile
     await prisma.teacherProfile.upsert({
       where: { userId },
