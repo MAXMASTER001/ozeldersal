@@ -206,6 +206,9 @@ export default async function SearchPage({
                       </div>
 
                       <div className="flex gap-2 mb-4 flex-wrap">
+                        {listing.user.email.endsWith(".test") && (
+                          <Badge variant="secondary" className="bg-orange-50 text-orange-700 hover:bg-orange-100 dark:bg-orange-500/10 dark:text-orange-300">Örnek profil</Badge>
+                        )}
                         <Badge variant="secondary">{listing.level}</Badge>
                         {extraLevels.map((l) => (
                           <Badge key={l} variant="outline">{l}</Badge>
@@ -232,7 +235,7 @@ export default async function SearchPage({
 
                       <div className="mt-auto flex justify-end">
                         <Link href={`/teacher/${listing.userId}`}>
-                          <Button variant="outline">Profili İncele</Button>
+                          <Button variant="primary">Profili İncele</Button>
                         </Link>
                       </div>
                     </div>
