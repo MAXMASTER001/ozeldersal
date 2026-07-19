@@ -8,7 +8,7 @@ Dokploy GitHub webhook'u `push` anında deploy başlatır; webhook CI sonucunu b
 
 - yalnızca pull request ile birleştirme;
 - gerekli durum kontrolü: `quality`;
-- güncel dalın tekrar onayı ve en az bir onay;
+- güncel dalın tekrar onayı; ekip çalışmasında en az bir onay;
 - doğrudan push'u ve force push'u engelleme;
 - yönetici hesapları da kurala tabi olsun.
 
