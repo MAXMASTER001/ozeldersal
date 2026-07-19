@@ -3,13 +3,18 @@
 import { useState } from "react";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { addReview } from "@/actions/review";
+import { addReview, updateReview } from "@/actions/review";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-export function ReviewForm({ teacherProfileId }: { teacherProfileId: string }) {
-  const [rating, setRating] = useState(5);
+type ExistingReview = { id: string; rating: number; comment: string | null };
+
+export function ReviewForm({ teacherProfileId, teacherUserId, existingReview }: { teacherProfileId: string; teacherUserId: string; existingReview?: ExistingReview }) {
+  const router = useRouter();
+  const isEditing = Boolean(existingReview);
+  const [rating, setRating] = useState(existingReview?.rating ?? 5);
   const [hoverRating, setHoverRating] = useState(0);
-  const [comment, setComment] = useState("");
+  const [comment, setComment] = useState(existingReview?.comment ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitReview = async () => {
@@ -20,15 +25,16 @@ export function ReviewForm({ teacherProfileId }: { teacherProfileId: string }) {
     }
     
     setIsSubmitting(true);
-    const result = await addReview(teacherProfileId, rating, comment);
+    const result = isEditing && existingReview
+      ? await updateReview(existingReview.id, teacherProfileId, teacherUserId, rating, comment)
+      : await addReview(teacherProfileId, teacherUserId, rating, comment);
     setIsSubmitting(false);
 
     if (result.error) {
       toast.error(result.error);
     } else {
-      toast.success("Yorumunuz başarıyla eklendi!");
-      setComment("");
-      setRating(5);
+      toast.success(isEditing ? "Yorumunuz güncellendi!" : "Yorumunuz başarıyla eklendi!");
+      router.refresh();
     }
   };
 
@@ -39,7 +45,7 @@ export function ReviewForm({ teacherProfileId }: { teacherProfileId: string }) {
 
   return (
     <form onSubmit={handleSubmit} className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm mt-8">
-      <h3 className="text-xl font-bold mb-4">Değerlendirme Bırakın</h3>
+      <h3 className="text-xl font-bold mb-4">{isEditing ? "Yorumunuzu Düzenleyin" : "Değerlendirme Bırakın"}</h3>
       
       <div className="flex items-center gap-2 mb-4">
         <span className="text-sm font-medium mr-2">Puan:</span>
@@ -76,7 +82,7 @@ export function ReviewForm({ teacherProfileId }: { teacherProfileId: string }) {
       </div>
 
       <Button type="button" onClick={submitReview} disabled={isSubmitting} className="w-full">
-        {isSubmitting ? "Gönderiliyor..." : "Yorumu Gönder"}
+        {isSubmitting ? "Kaydediliyor..." : isEditing ? "Yorumu Güncelle" : "Yorumu Gönder"}
       </Button>
     </form>
   );

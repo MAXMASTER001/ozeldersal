@@ -4,15 +4,26 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function addReview(teacherProfileId: string, rating: number, comment: string) {
+function validateReview(rating: number, comment: string) {
+  if (rating < 1 || rating > 5) return "Puan 1 ile 5 arasında olmalıdır.";
+  if (comment.trim().length > 1_000) return "Yorum en fazla 1000 karakter olabilir.";
+  return null;
+}
+
+async function refreshReviewPages(teacherUserId: string) {
+  revalidatePath(`/teacher/${teacherUserId}`);
+  revalidatePath("/search");
+  revalidatePath("/");
+}
+
+export async function addReview(teacherProfileId: string, teacherUserId: string, rating: number, comment: string) {
   const session = await auth();
   if (!session?.user?.id) {
     return { error: "Yorum yapmak için giriş yapmalısınız." };
   }
 
-  if (rating < 1 || rating > 5) {
-    return { error: "Puan 1 ile 5 arasında olmalıdır." };
-  }
+  const validationError = validateReview(rating, comment);
+  if (validationError) return { error: validationError };
 
   try {
     // Determine if user has already reviewed this teacher
@@ -37,7 +48,7 @@ export async function addReview(teacherProfileId: string, rating: number, commen
           studentId: session.user.id!,
           teacherProfileId,
           rating,
-          comment,
+          comment: comment.trim() || null,
         },
       });
 
@@ -58,14 +69,37 @@ export async function addReview(teacherProfileId: string, rating: number, commen
       });
     });
 
-    revalidatePath(`/teacher/${teacherProfileId}`);
-    revalidatePath(`/search`);
-    revalidatePath(`/`);
+    await refreshReviewPages(teacherUserId);
     
     return { success: true };
   } catch (error) {
     console.error("Add review error:", error);
     return { error: "Yorum eklenirken bir hata oluştu." };
+  }
+}
+
+export async function updateReview(reviewId: string, teacherProfileId: string, teacherUserId: string, rating: number, comment: string) {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Yorum düzenlemek için giriş yapmalısınız." };
+
+  const validationError = validateReview(rating, comment);
+  if (validationError) return { error: validationError };
+
+  try {
+    const review = await prisma.review.findFirst({ where: { id: reviewId, studentId: session.user.id, teacherProfileId } });
+    if (!review) return { error: "Yalnızca kendi yorumunuzu düzenleyebilirsiniz." };
+
+    await prisma.$transaction(async (tx) => {
+      await tx.review.update({ where: { id: review.id }, data: { rating, comment: comment.trim() || null } });
+      const aggregates = await tx.review.aggregate({ where: { teacherProfileId }, _avg: { rating: true }, _count: { rating: true } });
+      await tx.teacherProfile.update({ where: { id: teacherProfileId }, data: { averageRating: aggregates._avg.rating || 0, reviewCount: aggregates._count.rating || 0 } });
+    });
+
+    await refreshReviewPages(teacherUserId);
+    return { success: true };
+  } catch (error) {
+    console.error("Update review error:", error);
+    return { error: "Yorum güncellenirken bir hata oluştu." };
   }
 }
 

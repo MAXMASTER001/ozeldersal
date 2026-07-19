@@ -40,8 +40,8 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
     });
   }
 
-  const hasReviewed = session?.user?.id
-    ? reviews?.some((r) => r.studentId === session.user.id)
+  const currentUserReview = session?.user?.id
+    ? reviews?.find((r) => r.studentId === session.user.id)
     : false;
 
   const educationText = [
@@ -171,8 +171,8 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
             </div>
 
             {/* Review Form */}
-            {(!hasReviewed && session?.user?.id !== user.id) && (
-              <ReviewForm teacherProfileId={profile.id} />
+            {(session?.user?.id && session.user.id !== user.id) && (
+              <ReviewForm teacherProfileId={profile.id} teacherUserId={user.id} existingReview={currentUserReview ? { id: currentUserReview.id, rating: currentUserReview.rating, comment: currentUserReview.comment } : undefined} />
             )}
           </section>
         </div>
