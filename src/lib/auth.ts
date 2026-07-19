@@ -35,8 +35,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const key = `login:${crypto.createHash("sha256").update(ip).digest("hex")}`;
         const limit = await consumeRateLimit(key, 10, 15 * 60 * 1000);
         if (!limit.allowed) return null;
+        const email = String(credentials.email).trim().toLowerCase();
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string }
+          where: { email }
         });
 
         if (!user || !user.password || !user.emailVerified || user.isSuspended) {

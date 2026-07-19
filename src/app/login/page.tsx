@@ -28,7 +28,7 @@ export default function LoginPage() {
       });
 
       if (res?.error) {
-        toast.error("Giriş başarısız. Lütfen bilgilerinizi kontrol edin.");
+        toast.error("Giriş başarısız. Bilgilerinizi ve e-posta doğrulamasını kontrol edin.");
       } else {
         toast.success("Başarıyla giriş yapıldı.");
         router.push("/");

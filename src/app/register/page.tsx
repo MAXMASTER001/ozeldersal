@@ -1,21 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { registerUser } from "@/actions/auth";
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [verificationSent, setVerificationSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setVerificationSent(false);
 
     const formData = new FormData(e.currentTarget);
     
@@ -25,7 +25,7 @@ export default function RegisterPage() {
       if (res.error) {
         setError(res.error);
       } else if (res.success) {
-        router.push("/login");
+        setVerificationSent(true);
       }
     } catch {
       setError("Bir hata oluştu.");
@@ -43,6 +43,12 @@ export default function RegisterPage() {
         {error && (
           <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm mb-4">
             {error}
+          </div>
+        )}
+        {verificationSent && (
+          <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-800 dark:border-green-900 dark:bg-green-950/40 dark:text-green-300">
+            <p className="font-semibold">Doğrulama e-postası gönderildi.</p>
+            <p className="mt-1">Gelen kutusu, Spam ve Tanıtımlar klasörünü kontrol edin. Bağlantıyı açmadan giriş yapılamaz.</p>
           </div>
         )}
 
@@ -73,7 +79,7 @@ export default function RegisterPage() {
         </form>
 
         <p className="text-center text-sm text-neutral-600 dark:text-neutral-400 mt-6">
-          Zaten hesabınız var mı? <Link href="/login" className="text-orange-600 dark:text-orange-400 font-semibold hover:underline">Giriş Yap</Link>
+          E-postanızı doğruladınız mı? <Link href="/login" className="text-orange-600 dark:text-orange-400 font-semibold hover:underline">Giriş Yap</Link>
         </p>
       </div>
     </div>
