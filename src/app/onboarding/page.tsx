@@ -292,6 +292,11 @@ export default function OnboardingPage() {
                     className="w-full border border-neutral-200 dark:border-neutral-700 rounded-md p-3 text-sm bg-transparent outline-none focus:border-black dark:focus:border-white min-h-[120px]"
                     placeholder="Kendinizden, öğretim tarzınızdan ve tecrübelerinizden bahsedin... (en az 20 karakter)"
                   ></textarea>
+                  {bio.length < 20 && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-1" role="status">
+                      Profili tamamlamak için biyografiniz en az 20 karakter olmalı. {20 - bio.length} karakter daha yazın.
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
