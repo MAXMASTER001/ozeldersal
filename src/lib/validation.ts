@@ -13,11 +13,17 @@ export const registerSchema = z.object({
   role: z.enum(["TEACHER", "STUDENT"]),
 });
 
-export const phoneSchema = z
+const normalizedPhoneSchema = z
   .string()
-  .regex(/^(\+90|0)?[0-9]{10}$/, { message: "Geçerli bir telefon numarası giriniz (örn: 05XX XXX XX XX)." })
-  .optional()
-  .or(z.literal(""));
+  .trim()
+  .transform((value) => value.replace(/[\s()-]/g, ""))
+  .refine((value) => /^(\+90|0)?[0-9]{10}$/.test(value), {
+    message: "Geçerli bir telefon numarası giriniz (örn: 05XX XXX XX XX).",
+  });
+
+export const requiredPhoneSchema = normalizedPhoneSchema;
+
+export const phoneSchema = normalizedPhoneSchema.optional().or(z.literal(""));
 
 export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, { message: "Mevcut şifrenizi giriniz." }),

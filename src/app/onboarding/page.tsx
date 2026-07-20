@@ -26,6 +26,7 @@ export default function OnboardingPage() {
   const [department, setDepartment] = useState("");
   const [graduationYear, setGraduationYear] = useState("");
   const [bio, setBio] = useState("");
+  const [phone, setPhone] = useState("");
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -62,7 +63,7 @@ export default function OnboardingPage() {
     price !== "" &&
     Number(price) > 0 &&
     (locationType === "Sadece Online" || location !== "");
-  const canSubmit = bio.length >= 20 && bio.length <= 300;
+  const canSubmit = bio.length >= 20 && bio.length <= 300 && phone.trim().length > 0;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -80,6 +81,7 @@ export default function OnboardingPage() {
         graduationYear: graduationYear ? Number(graduationYear) : null,
         bio,
         photoUrl,
+        phone,
       });
 
       if (res?.error) {
@@ -247,6 +249,18 @@ export default function OnboardingPage() {
               <p className="text-neutral-500 mb-6">Bir profil fotoğrafı ekleyin ve kısa bir biyografi yazın.</p>
 
               <div className="space-y-5">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Cep Telefonu</label>
+                  <Input
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="05XX XXX XX XX"
+                    type="tel"
+                    autoComplete="tel"
+                    required
+                  />
+                  <p className="text-xs text-neutral-500 mt-1">Zorunludur; herkese açık profilinizde gösterilmez.</p>
+                </div>
                 <div className="flex items-center gap-4">
                   <button
                     type="button"
